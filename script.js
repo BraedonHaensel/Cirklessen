@@ -6,6 +6,10 @@ let canvas = document.getElementById("gameCanvas");
 let ctx = canvas.getContext("2d"); // used for 2D graphics
 document.querySelector("main").focus(); // focus on main
 
+// Background image
+const backgroundImg = new Image();
+backgroundImg.src = "art/background.png";
+
 // VARIABLES
 let gameRunning = false;
 let player;
@@ -25,6 +29,7 @@ class CircleEntity {
     friction = 0.83;
 
     radius;
+    color = "rgba(0,0,255,1.00)";
 
     constructor(x, y, radius=20) {
         this.x = x;
@@ -45,7 +50,7 @@ class CircleEntity {
     }
 
     draw() {
-        ctx.fillStyle = "rgba(0,0,255,1.00)";
+        ctx.fillStyle = this.color;
         ctx.beginPath();
         let startAngle = 0; // Starting point on circle
         let endAngle = 2 * Math.PI; // End point on circle
@@ -57,13 +62,14 @@ class CircleEntity {
 }
 
 class Enemy extends CircleEntity {
-    static spawnRadius = 20;
+    static spawnRadius = 50;
     static spawnVelocity = 3;
 
     constructor(x, y, velx, vely, radius) {
         super(x, y, radius);
         this.velx = velx;
         this.vely = vely;
+        this.color = getRandomColor();
     }
 
     // No constructor needed, as all args can go straight to super()
@@ -152,16 +158,56 @@ class Player extends CircleEntity {
         if (!(this.accUp != this.accDown)) this.vely *= this.friction;
     }
 
+    eat(enemy) {
+        // Grow based on enemy's size
+        this.radius += enemy.radius * 0.1;
+    }
 }
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
+// Get a random color
+function getRandomColor() {
+    red = getRandomInt(255);
+    green = getRandomInt(255);
+    blue = getRandomInt(255);
+    return `rgba(${red}, ${green}, ${blue}, 1.00)`
+}
+
 // Draw the background
 function drawBackground () {
-    ctx.fillStyle = "rgba(255,44,44,1.00)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // ctx.fillStyle = "rgba(90,90,90,1.00)";
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+}
+
+// Check for collisions between the player and all enemies
+function checkCollisions () {
+    for (let i = 0; i < enemies.length; i++) {
+        enemy = enemies[i];
+        // Collision parameters
+        let distance = Math.sqrt((player.x - enemy.x) ** 2 + (player.y - enemy.y)** 2)
+        let largerRadius = Math.max(enemy.radius, player.radius);
+        let smallerRadius = Math.min(enemy.radius, player.radius);
+        if (distance <= largerRadius - (smallerRadius * 0.5)) {
+            // Collision detected
+            enemy.color = "rgba(255, 255, 255, 1.00)"
+
+            if (enemy.radius > player.radius) {
+                // Game over
+                console.log("Game Over!");
+                return;
+            }
+
+            // Player larger, eat the circle
+            player.eat(enemy);
+
+            // Remove enemy
+            enemies.splice(enemies.indexOf(enemy), 1);
+        }
+    }
 }
 
 // FRAME UPDATE
@@ -173,17 +219,20 @@ function update () {
     // Draw the background
     drawBackground();
 
+    // Update elements
     player.update();
-    player.draw();
-
     enemies.forEach(enemy => enemy.update());
+    checkCollisions();
+
+    // Draw elements
+    player.draw();
     enemies.forEach(enemy => enemy.draw());
 }
 
 // START A NEW GAME
 function newGame () {
     // Spawn player
-    player = new Player(canvas.width / 2, canvas.height / 2, 30);
+    player = new Player(canvas.width / 2, canvas.height / 2, 60);
 
     // debug
     for (let i = 0; i < 10; i++) {
