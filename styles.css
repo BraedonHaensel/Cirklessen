@@ -1,0 +1,32 @@
+/* Reset universal formatting for browser compatibility */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: rgba(17,17,17,1.00);
+}
+
+/* Hide border when tabbing over the main game container */
+main:focus {
+	outline-width: 0;
+}
+
+/* Game canvas */
+#gameCanvas {
+	/* Actual canvas size is defined in the html file. Resizes the display
+	of the canvas to fit the screen, while maintaining the aspect ratio. */
+	aspect-ratio: auto;
+	max-width: 90vw;
+	max-height: 90vh;
+	
+	border: 1.5px solid gray;
+	border-radius: 20px;
+	box-shadow: 0 0 25px 2px gray;
+}
