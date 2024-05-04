@@ -62,8 +62,9 @@ class CircleEntity {
 }
 
 class Enemy extends CircleEntity {
-    static spawnRadius = 50;
-    static spawnVelocity = 3;
+    static maxSpawnRadius = 20;
+    static minSpawnRadius = 2;
+    static spawnVelocity = 5;
 
     constructor(x, y, velx, vely, radius) {
         super(x, y, radius);
@@ -74,8 +75,8 @@ class Enemy extends CircleEntity {
 
     // No constructor needed, as all args can go straight to super()
     static getNewEnemy() {
-        // Random radius between 0.9 and 1 times the Enemy spawn size
-        let radius = Enemy.spawnRadius - getRandomInt(Enemy.spawnRadius * 0.1);
+        // Random spawn radius within range
+        let radius = getRandomInt(Enemy.maxSpawnRadius - Enemy.minSpawnRadius) + Enemy.minSpawnRadius;
 
         let x = 0;
         let y = 0;
@@ -123,7 +124,7 @@ function enemySpawnManager () {
     // Add new enemy
     enemies.push(Enemy.getNewEnemy());
     // Set timeout for next enemy spawn
-    setTimeout(enemySpawnManager, 1000);
+    setTimeout(enemySpawnManager, 300);
 }
 
 class Player extends CircleEntity {
@@ -158,9 +159,16 @@ class Player extends CircleEntity {
         if (!(this.accUp != this.accDown)) this.vely *= this.friction;
     }
 
+    updateDifficulty() {
+        // Difficulty scales based on player size
+    }
+
     eat(enemy) {
         // Grow based on enemy's size
-        this.radius += enemy.radius * 0.1;
+        this.radius += Math.max(1, enemy.radius * 0.1);
+        // Update enemy spawn radius
+        Enemy.maxSpawnRadius = this.radius * 2;
+        Enemy.minSpawnRadius = this.radius * 0.2;
     }
 }
 
@@ -232,7 +240,7 @@ function update () {
 // START A NEW GAME
 function newGame () {
     // Spawn player
-    player = new Player(canvas.width / 2, canvas.height / 2, 60);
+    player = new Player(canvas.width / 2, canvas.height / 2, 10);
 
     // debug
     for (let i = 0; i < 10; i++) {
@@ -245,7 +253,6 @@ function newGame () {
     gameRunning = true;
 }
 
-// MOVE THE SHIP AND SHOOT THE LASERS ON KEYDOWN
 function keyDown (e) {
     if (!gameRunning) {
         return;
