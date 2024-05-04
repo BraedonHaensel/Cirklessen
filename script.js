@@ -16,7 +16,7 @@ let enemies = [];
 class CircleEntity {
     x;
     y;
-    velx = 0;
+    velx = 1;
     vely = 0;
     topSpeed = 10;
     accRate = 1.5;
@@ -34,12 +34,10 @@ class CircleEntity {
 
     update() {
         // Update velocity
-        console.log(this.vely);
         this.velx = Math.min(this.velx + this.accx, this.topSpeed);
         this.velx = Math.max(this.velx, -this.topSpeed);
         this.vely = Math.min(this.vely + this.accy, this.topSpeed);
         this.vely = Math.max(this.vely, -this.topSpeed);
-        console.log("a: ", this.vely);
 
         // Update position
         this.x += this.velx;
@@ -59,7 +57,67 @@ class CircleEntity {
 }
 
 class Enemy extends CircleEntity {
+    static spawnRadius = 20;
+    static spawnVelocity = 3;
+
+    constructor(x, y, velx, vely, radius) {
+        super(x, y, radius);
+        this.velx = velx;
+        this.vely = vely;
+    }
+
     // No constructor needed, as all args can go straight to super()
+    static getNewEnemy() {
+        // Random radius between 0.9 and 1 times the Enemy spawn size
+        let radius = Enemy.spawnRadius - getRandomInt(Enemy.spawnRadius * 0.1);
+
+        let x = 0;
+        let y = 0;
+        let xdir = 0;
+        let ydir = 0;
+        // Pick a spawning axis
+        if (getRandomInt(2)) {
+            // Get random x coordinate (with radius buffer on either side)
+            x = getRandomInt(canvas.width + 2 * radius) - radius;
+            xdir = getRandomInt(2);
+            // Determine if top or bottom spawn
+            if (getRandomInt(2)) {
+                y = -radius;
+                ydir = 1;
+            } else {
+                y = canvas.height + radius;
+                ydir = -1;
+            }
+        } else {
+            // Get random y coordinate (with radius buffer on either side)
+            y = getRandomInt(canvas.height + 2 * radius) - radius;
+            ydir = getRandomInt(2);
+            // Determine if left or right spawn
+            if (getRandomInt(2)) {
+                x = -radius;
+                xdir = 1;
+            } else {
+                x = canvas.width + radius;
+                xdir = -1;
+            }
+        }
+
+        // Random velocities between 0.5 and 1 times the Enemy spawn velocity
+        let velx = Enemy.spawnVelocity - getRandomInt(Enemy.spawnVelocity * 0.5);
+        let vely = Enemy.spawnVelocity - getRandomInt(Enemy.spawnVelocity * 0.5);
+        // Correct for spawn directions
+        velx *= xdir;
+        vely *= ydir;
+
+        return new Enemy(x, y, velx, vely, radius);
+    }
+}
+
+function enemySpawnManager () {
+    // Add new enemy
+    enemies.push(Enemy.getNewEnemy());
+    // Set timeout for next enemy spawn
+    setTimeout(enemySpawnManager, 1000);
 }
 
 class Player extends CircleEntity {
@@ -96,20 +154,14 @@ class Player extends CircleEntity {
 
 }
 
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
 // Draw the background
 function drawBackground () {
     ctx.fillStyle = "rgba(255,44,44,1.00)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
-
-// BUILD A NEW SHIP
-function newShip () {
-	return {
-		x: canvas.width / 2,
-		y: canvas.height / 2,
-		r: shipSize / 2,
-		a: 90 / 180 * Math.PI, // radiant
-	}
 }
 
 // FRAME UPDATE
@@ -124,17 +176,22 @@ function update () {
     player.update();
     player.draw();
 
-    // Draw enemies
+    enemies.forEach(enemy => enemy.update());
     enemies.forEach(enemy => enemy.draw());
 }
 
 // START A NEW GAME
 function newGame () {
+    // Spawn player
     player = new Player(canvas.width / 2, canvas.height / 2, 30);
-	ship = newShip();
+
+    // debug
     for (let i = 0; i < 10; i++) {
         enemies.push(new Enemy(i * 100, 200));
     }
+
+    // Schedule first enemy spawn
+    setTimeout(enemySpawnManager, 1000);
 
     gameRunning = true;
 }
