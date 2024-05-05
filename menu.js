@@ -21,14 +21,14 @@ class Button {
     textY;
     clickFunction;
 
-    constructor(x, y, width, height, text, fontSize, color, textColor, clickFunction) {
+    constructor(x, y, width, height, color, text, fontSize, textColor, clickFunction) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.color = color;
         this.text = text;
         this.font = `${fontSize}px serif`;
-        this.color = color;
         this.textColor = textColor;
         this.clickFunction = clickFunction;
         this.calculateTextPosition();
@@ -117,26 +117,46 @@ function foo() {
 
 class Title {
     static titleButtons = [
-        new Button(100, 200, 200, 100, "ooo", 40, "blue", "red", foo),
+        new Button(100, 200, 200, 100, "blue", "ooo", 40, "red", foo)
     ];
     static titleTexts = [];
 
     // Setup title text
     static {
-        let z;
-        let titleText = "CIRKLESSEN"
+        let titleText = "CIRKLESSEN";
         let titleFont = "120px Arial Black";
         let titleColor = "rgba(200, 200, 200, 1)";
         let titleBorderColor = "black";
-        let textSize = getTextSize(titleText, titleFont)
-        let titleX = canvas.width / 2 - textSize.width / 2
+        let textSize = getTextSize(titleText, titleFont);
+        let titleX = canvas.width / 2 - textSize.width / 2;
         let titleY = canvas.height * 0.2;
         this.titleTexts.push(new BorderedText(titleText, titleFont, titleColor, titleX, titleY, titleBorderColor));
     }
 
     // Setup start button
     static {
-        
+        let startText = "START";
+        let startFont = "60px serif";
+        let startTextColor = "white";
+        let startWidth = canvas.width * 0.2
+        let startHeight = canvas.height * 0.15;
+        let startX = canvas.width / 2 - startWidth / 2;
+        let startY = canvas.height * 0.75;
+        let startColor = "red";
+
+
+
+
+        // TODO: START CLICK FUNCTION
+        function foobar() {
+
+        }
+        // push(....., foobar?);
+
+
+
+        this.titleButtons.push(new Button(startX, startY, startWidth, startHeight, 
+            startColor, startText, startFont, startTextColor, foo));
     }
 
 
