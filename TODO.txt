@@ -1,0 +1,5 @@
+Enum for game states so UI knows which screen to display
+Two player mode
+Difficulty selectors on menu screen (speed, population)
+Cap player/enemy size
+Score/time display
