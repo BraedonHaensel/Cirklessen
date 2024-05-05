@@ -235,6 +235,8 @@ function update () {
     // Draw elements
     player.draw();
     enemies.forEach(enemy => enemy.draw());
+
+    UIManager.draw();
 }
 
 // START A NEW GAME
@@ -311,9 +313,22 @@ function keyUp (e) {
     }
 }
 
+function mouseClick(e) {
+    // Get coordinates relative to canvas
+    let rect = canvas.getBoundingClientRect();
+    let scaleX = canvas.width / rect.width;
+    let scaleY = canvas.height / rect.height;
+    let x = (e.clientX - rect.left) * scaleX;
+    let y = (e.clientY - rect.top) * scaleY;
+
+    // Pass to UI Manager
+    UIManager.clickAt(x, y);
+}
+
 // Add keyboard event listeners
 document.addEventListener("keydown", keyDown);
 document.addEventListener("keyup", keyUp);
+canvas.addEventListener("click", mouseClick);
 
 // Set update interval
 setInterval(update, 1000 / FPS); // call update every 1/FPS seconds
