@@ -11,10 +11,18 @@ const backgroundImg = new Image();
 backgroundImg.src = "art/background.png";
 
 // VARIABLES
-let gameRunning = false;
+let gameState;
 let player;
 let ship;
 let enemies = [];
+
+// Note: Compare with gameState == gameStates.<State>
+const GameStates = {
+    RUNNING: 0,
+    TITLE: 1,
+    GAMEOVER: 2
+}
+gameState = GameStates.TITLE;
 
 // Parent class for circle entities (player / enemies)
 class CircleEntity {
@@ -220,12 +228,14 @@ function checkCollisions () {
 
 // FRAME UPDATE
 function update () {
-    if (!gameRunning) {
-        return;
-    }
-
     // Draw the background
     drawBackground();
+
+    if (gameState != GameStates.RUNNING) {
+        // Draw UI
+        UIManager.draw();
+        return;
+    }
 
     // Update elements
     player.update();
@@ -235,8 +245,6 @@ function update () {
     // Draw elements
     player.draw();
     enemies.forEach(enemy => enemy.draw());
-
-    UIManager.draw();
 }
 
 // START A NEW GAME
@@ -244,19 +252,15 @@ function newGame () {
     // Spawn player
     player = new Player(canvas.width / 2, canvas.height / 2, 10);
 
-    // debug
-    for (let i = 0; i < 10; i++) {
-        enemies.push(new Enemy(i * 100, 200));
-    }
-
     // Schedule first enemy spawn
     setTimeout(enemySpawnManager, 1000);
 
-    gameRunning = true;
+    // Update game state
+    gameState = GameStates.RUNNING;
 }
 
 function keyDown (e) {
-    if (!gameRunning) {
+    if (gameState != GameStates.RUNNING) {
         return;
     }
 
@@ -285,7 +289,7 @@ function keyDown (e) {
 }
 
 function keyUp (e) {
-    if (!gameRunning) {
+    if (gameState != GameStates.RUNNING) {
         return;
     }
 
@@ -332,6 +336,3 @@ canvas.addEventListener("click", mouseClick);
 
 // Set update interval
 setInterval(update, 1000 / FPS); // call update every 1/FPS seconds
-
-// Start the game
-newGame();

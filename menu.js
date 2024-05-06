@@ -2,7 +2,6 @@ function getTextSize(text, font) {
     ctx.font = font;
     let metrics = ctx.measureText(text);
     let textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-    console.log(metrics.width);
     return {width: metrics.width, height: textHeight};
 }
 
@@ -76,7 +75,6 @@ class UIManager {
 
     // Handle mouse clicks
     static clickAt(x, y) {
-        console.log(x, y);
         Title.clickAt(x, y);
     }
 }
@@ -111,14 +109,8 @@ class BorderedText extends Text {
     }
 }
 
-function foo() {
-    console.log("success");
-}
-
 class Title {
-    static titleButtons = [
-        new Button(100, 200, 200, 100, "blue", "ooo", 40, "red", foo)
-    ];
+    static titleButtons = [];
     static titleTexts = [];
 
     // Setup title text
@@ -144,35 +136,21 @@ class Title {
         let startY = canvas.height * 0.75;
         let startColor = "red";
 
-
-
-
-        // TODO: START CLICK FUNCTION
-        function foobar() {
-
+        // Start a mew game
+        function startButtonAction() {
+            newGame();
         }
-        // push(....., foobar?);
-
-
 
         this.titleButtons.push(new Button(startX, startY, startWidth, startHeight, 
-            startColor, startText, startFont, startTextColor, foo));
+            startColor, startText, startFont, startTextColor, startButtonAction));
     }
-
-
 
     static draw() {
         // Background blur
         ctx.fillStyle = "rgba(100, 100, 100, 0.50)";
         ctx.roundRect(canvas.width * 0.05, canvas.height * 0.05, 
-                        canvas.width * 0.9, canvas.height * 0.9, 50);
+            canvas.width * 0.9, canvas.height * 0.9, 50);
         ctx.fill();
-
-        ctx.fillStyle = "red";
-        ctx.fillRect(0, 0, 100, 100);
-
-        ctx.font = "48px serif";
-        ctx.fillText("Hello world", 10, 50);
 
         // Draw elements
         Title.titleTexts.forEach(text => text.draw());
