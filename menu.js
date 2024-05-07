@@ -117,7 +117,7 @@ class Title {
     static {
         let titleText = "CIRKLESSEN";
         let titleFont = "120px Arial Black";
-        let titleColor = "rgba(200, 200, 200, 1)";
+        let titleColor = "rgba(220, 220, 220, 1)";
         let titleBorderColor = "black";
         let textSize = getTextSize(titleText, titleFont);
         let titleX = canvas.width / 2 - textSize.width / 2;

@@ -243,8 +243,8 @@ function update () {
     checkCollisions();
 
     // Draw elements
-    player.draw();
     enemies.forEach(enemy => enemy.draw());
+    player.draw();
 }
 
 // START A NEW GAME
